@@ -90,7 +90,7 @@ queries = [
 
 # Log all queries to stdout.
 [plugins.query_logger]
-enabled = false
+enabled = true
 
 # Block access to tables that Postgres does not allow us to control.
 [plugins.table_access]
@@ -103,7 +103,7 @@ tables = [
 
 # Intercept user queries and give a fake reply.
 [plugins.intercept]
-enabled = true
+enabled = false
 
 [plugins.intercept.queries.0]
 
@@ -129,202 +129,202 @@ result = [
 ]
 
 
-# pool configs are structured as pool.<pool_name>
-# the pool_name is what clients use as database name when connecting.
-# For a pool named `sharded_db`, clients access that pool using connection string like
-# `postgres://sharding_user:sharding_user@pgcat_host:pgcat_port/sharded_db`
-[pools.sharded_db]
-# Pool mode (see PgBouncer docs for more).
-# `session` one server connection per connected client
-# `transaction` one server connection per client transaction
-pool_mode = "transaction"
+# # pool configs are structured as pool.<pool_name>
+# # the pool_name is what clients use as database name when connecting.
+# # For a pool named `sharded_db`, clients access that pool using connection string like
+# # `postgres://sharding_user:sharding_user@pgcat_host:pgcat_port/sharded_db`
+# [pools.sharded_db]
+# # Pool mode (see PgBouncer docs for more).
+# # `session` one server connection per connected client
+# # `transaction` one server connection per client transaction
+# pool_mode = "transaction"
 
-# Load balancing mode
-# `random` selects the server at random
-# `loc` selects the server with the least outstanding busy conncetions
-load_balancing_mode = "random"
+# # Load balancing mode
+# # `random` selects the server at random
+# # `loc` selects the server with the least outstanding busy conncetions
+# load_balancing_mode = "random"
 
-# If the client doesn't specify, PgCat routes traffic to this role by default.
-# `any` round-robin between primary and replicas,
-# `replica` round-robin between replicas only without touching the primary,
-# `primary` all queries go to the primary unless otherwise specified.
-default_role = "any"
+# # If the client doesn't specify, PgCat routes traffic to this role by default.
+# # `any` round-robin between primary and replicas,
+# # `replica` round-robin between replicas only without touching the primary,
+# # `primary` all queries go to the primary unless otherwise specified.
+# default_role = "any"
 
-# Prepared statements cache size.
-# TODO: update documentation
-prepared_statements_cache_size = 500
+# # Prepared statements cache size.
+# # TODO: update documentation
+# prepared_statements_cache_size = 500
 
-# If Query Parser is enabled, we'll attempt to parse
-# every incoming query to determine if it's a read or a write.
-# If it's a read query, we'll direct it to a replica. Otherwise, if it's a write,
-# we'll direct it to the primary.
-query_parser_enabled = true
+# # If Query Parser is enabled, we'll attempt to parse
+# # every incoming query to determine if it's a read or a write.
+# # If it's a read query, we'll direct it to a replica. Otherwise, if it's a write,
+# # we'll direct it to the primary.
+# query_parser_enabled = true
 
-# If the query parser is enabled and this setting is enabled, we'll attempt to
-# infer the role from the query itself.
-query_parser_read_write_splitting = true
+# # If the query parser is enabled and this setting is enabled, we'll attempt to
+# # infer the role from the query itself.
+# query_parser_read_write_splitting = true
 
-# If the query parser is enabled and this setting is enabled, the primary will be part of the pool of databases used for
-# load balancing of read queries. Otherwise, the primary will only be used for write
-# queries. The primary can always be explicitly selected with our custom protocol.
-primary_reads_enabled = true
+# # If the query parser is enabled and this setting is enabled, the primary will be part of the pool of databases used for
+# # load balancing of read queries. Otherwise, the primary will only be used for write
+# # queries. The primary can always be explicitly selected with our custom protocol.
+# primary_reads_enabled = true
 
-# Allow sharding commands to be passed as statement comments instead of
-# separate commands. If these are unset this functionality is disabled.
-# sharding_key_regex = '/\* sharding_key: (\d+) \*/'
-# shard_id_regex = '/\* shard_id: (\d+) \*/'
-# regex_search_limit = 1000 # only look at the first 1000 characters of SQL statements
+# # Allow sharding commands to be passed as statement comments instead of
+# # separate commands. If these are unset this functionality is disabled.
+# # sharding_key_regex = '/\* sharding_key: (\d+) \*/'
+# # shard_id_regex = '/\* shard_id: (\d+) \*/'
+# # regex_search_limit = 1000 # only look at the first 1000 characters of SQL statements
 
-# Defines the behavior when no shard is selected in a sharded system.
-# `random`: picks a shard at random
-# `random_healthy`: picks a shard at random favoring shards with the least number of recent errors
-# `shard_<number>`: e.g. shard_0, shard_4, etc. picks a specific shard, everytime
-# no_shard_specified_behavior = "shard_0"
+# # Defines the behavior when no shard is selected in a sharded system.
+# # `random`: picks a shard at random
+# # `random_healthy`: picks a shard at random favoring shards with the least number of recent errors
+# # `shard_<number>`: e.g. shard_0, shard_4, etc. picks a specific shard, everytime
+# # no_shard_specified_behavior = "shard_0"
 
-# So what if you wanted to implement a different hashing function,
-# or you've already built one and you want this pooler to use it?
-# Current options:
-# `pg_bigint_hash`: PARTITION BY HASH (Postgres hashing function)
-# `sha1`: A hashing function based on SHA1
-sharding_function = "pg_bigint_hash"
+# # So what if you wanted to implement a different hashing function,
+# # or you've already built one and you want this pooler to use it?
+# # Current options:
+# # `pg_bigint_hash`: PARTITION BY HASH (Postgres hashing function)
+# # `sha1`: A hashing function based on SHA1
+# sharding_function = "pg_bigint_hash"
 
-# Query to be sent to servers to obtain the hash used for md5 authentication. The connection will be
-# established using the database configured in the pool. This parameter is inherited by every pool
-# and can be redefined in pool configuration.
-# auth_query="SELECT usename, passwd FROM pg_shadow WHERE usename='$1'"
+# # Query to be sent to servers to obtain the hash used for md5 authentication. The connection will be
+# # established using the database configured in the pool. This parameter is inherited by every pool
+# # and can be redefined in pool configuration.
+# # auth_query="SELECT usename, passwd FROM pg_shadow WHERE usename='$1'"
 
-# User to be used for connecting to servers to obtain the hash used for md5 authentication by sending the query
-# specified in `auth_query_user`. The connection will be established using the database configured in the pool.
-# This parameter is inherited by every pool and can be redefined in pool configuration.
-# auth_query_user = "sharding_user"
+# # User to be used for connecting to servers to obtain the hash used for md5 authentication by sending the query
+# # specified in `auth_query_user`. The connection will be established using the database configured in the pool.
+# # This parameter is inherited by every pool and can be redefined in pool configuration.
+# # auth_query_user = "sharding_user"
 
-# Password to be used for connecting to servers to obtain the hash used for md5 authentication by sending the query
-# specified in `auth_query_user`. The connection will be established using the database configured in the pool.
-# This parameter is inherited by every pool and can be redefined in pool configuration.
-# auth_query_password = "sharding_user"
+# # Password to be used for connecting to servers to obtain the hash used for md5 authentication by sending the query
+# # specified in `auth_query_user`. The connection will be established using the database configured in the pool.
+# # This parameter is inherited by every pool and can be redefined in pool configuration.
+# # auth_query_password = "sharding_user"
 
-# Automatically parse this from queries and route queries to the right shard!
-# automatic_sharding_key = "data.id"
+# # Automatically parse this from queries and route queries to the right shard!
+# # automatic_sharding_key = "data.id"
 
-# Idle timeout can be overwritten in the pool
-idle_timeout = 40000
+# # Idle timeout can be overwritten in the pool
+# idle_timeout = 40000
 
-# Connect timeout can be overwritten in the pool
-connect_timeout = 3000
+# # Connect timeout can be overwritten in the pool
+# connect_timeout = 3000
 
-# When enabled, ip resolutions for server connections specified using hostnames will be cached
-# and checked for changes every `dns_max_ttl` seconds. If a change in the host resolution is found
-# old ip connections are closed (gracefully) and new connections will start using new ip.
-# dns_cache_enabled = false
+# # When enabled, ip resolutions for server connections specified using hostnames will be cached
+# # and checked for changes every `dns_max_ttl` seconds. If a change in the host resolution is found
+# # old ip connections are closed (gracefully) and new connections will start using new ip.
+# # dns_cache_enabled = false
 
-# Specifies how often (in seconds) cached ip addresses for servers are rechecked (see `dns_cache_enabled`).
-# dns_max_ttl = 30
+# # Specifies how often (in seconds) cached ip addresses for servers are rechecked (see `dns_cache_enabled`).
+# # dns_max_ttl = 30
 
-# Plugins can be configured on a pool-per-pool basis. This overrides the global plugins setting,
-# so all plugins have to be configured here again.
-[pool.sharded_db.plugins]
+# # Plugins can be configured on a pool-per-pool basis. This overrides the global plugins setting,
+# # so all plugins have to be configured here again.
+# [pool.sharded_db.plugins]
 
-[pools.sharded_db.plugins.prewarmer]
-enabled = true
-queries = [
-  "SELECT pg_prewarm('pgbench_accounts')",
-]
+# [pools.sharded_db.plugins.prewarmer]
+# enabled = true
+# queries = [
+#   "SELECT pg_prewarm('pgbench_accounts')",
+# ]
 
-[pools.sharded_db.plugins.query_logger]
-enabled = false
+# [pools.sharded_db.plugins.query_logger]
+# enabled = false
 
-[pools.sharded_db.plugins.table_access]
-enabled = false
-tables = [
-  "pg_user",
-  "pg_roles",
-  "pg_database",
-]
+# [pools.sharded_db.plugins.table_access]
+# enabled = false
+# tables = [
+#   "pg_user",
+#   "pg_roles",
+#   "pg_database",
+# ]
 
-[pools.sharded_db.plugins.intercept]
-enabled = true
+# [pools.sharded_db.plugins.intercept]
+# enabled = true
 
-[pools.sharded_db.plugins.intercept.queries.0]
+# [pools.sharded_db.plugins.intercept.queries.0]
 
-query = "select current_database() as a, current_schemas(false) as b"
-schema = [
-  ["a", "text"],
-  ["b", "text"],
-]
-result = [
-  ["${DATABASE}", "{public}"],
-]
+# query = "select current_database() as a, current_schemas(false) as b"
+# schema = [
+#   ["a", "text"],
+#   ["b", "text"],
+# ]
+# result = [
+#   ["${DATABASE}", "{public}"],
+# ]
 
-[pools.sharded_db.plugins.intercept.queries.1]
+# [pools.sharded_db.plugins.intercept.queries.1]
 
-query = "select current_database(), current_schema(), current_user"
-schema = [
-  ["current_database", "text"],
-  ["current_schema", "text"],
-  ["current_user", "text"],
-]
-result = [
-  ["${DATABASE}", "public", "${USER}"],
-]
+# query = "select current_database(), current_schema(), current_user"
+# schema = [
+#   ["current_database", "text"],
+#   ["current_schema", "text"],
+#   ["current_user", "text"],
+# ]
+# result = [
+#   ["${DATABASE}", "public", "${USER}"],
+# ]
 
-# User configs are structured as pool.<pool_name>.users.<user_index>
-# This section holds the credentials for users that may connect to this cluster
-[pools.sharded_db.users.0]
-# PostgreSQL username used to authenticate the user and connect to the server
-# if `server_username` is not set.
-username = "sharding_user"
+# # User configs are structured as pool.<pool_name>.users.<user_index>
+# # This section holds the credentials for users that may connect to this cluster
+# [pools.sharded_db.users.0]
+# # PostgreSQL username used to authenticate the user and connect to the server
+# # if `server_username` is not set.
+# username = "sharding_user"
 
-# PostgreSQL password used to authenticate the user and connect to the server
-# if `server_password` is not set.
-password = "sharding_user"
+# # PostgreSQL password used to authenticate the user and connect to the server
+# # if `server_password` is not set.
+# password = "sharding_user"
 
-pool_mode = "transaction"
+# pool_mode = "transaction"
 
-# PostgreSQL username used to connect to the server.
-# server_username = "another_user"
+# # PostgreSQL username used to connect to the server.
+# # server_username = "another_user"
 
-# PostgreSQL password used to connect to the server.
-# server_password = "another_password"
+# # PostgreSQL password used to connect to the server.
+# # server_password = "another_password"
 
-# Maximum number of server connections that can be established for this user
-# The maximum number of connection from a single Pgcat process to any database in the cluster
-# is the sum of pool_size across all users.
-pool_size = 9
+# # Maximum number of server connections that can be established for this user
+# # The maximum number of connection from a single Pgcat process to any database in the cluster
+# # is the sum of pool_size across all users.
+# pool_size = 9
 
 
-# Maximum query duration. Dangerous, but protects against DBs that died in a non-obvious way.
-# 0 means it is disabled.
-statement_timeout = 0
+# # Maximum query duration. Dangerous, but protects against DBs that died in a non-obvious way.
+# # 0 means it is disabled.
+# statement_timeout = 0
 
-[pools.sharded_db.users.1]
-username = "other_user"
-password = "other_user"
-pool_size = 21
-statement_timeout = 15000
-connect_timeout = 1000
-idle_timeout = 1000
+# [pools.sharded_db.users.1]
+# username = "other_user"
+# password = "other_user"
+# pool_size = 21
+# statement_timeout = 15000
+# connect_timeout = 1000
+# idle_timeout = 1000
 
-# Shard configs are structured as pool.<pool_name>.shards.<shard_id>
-# Each shard config contains a list of servers that make up the shard
-# and the database name to use.
-[pools.sharded_db.shards.0]
-# Array of servers in the shard, each server entry is an array of `[host, port, role]`
-servers = [["127.0.0.1", 5432, "primary"], ["localhost", 5432, "replica"]]
+# # Shard configs are structured as pool.<pool_name>.shards.<shard_id>
+# # Each shard config contains a list of servers that make up the shard
+# # and the database name to use.
+# [pools.sharded_db.shards.0]
+# # Array of servers in the shard, each server entry is an array of `[host, port, role]`
+# servers = [["127.0.0.1", 5432, "primary"], ["localhost", 5432, "replica"]]
 
-# Array of mirrors for the shard, each mirror entry is an array of `[host, port, index of server in servers array]`
-# Traffic hitting the server identified by the index will be sent to the mirror.
-# mirrors = [["1.2.3.4", 5432, 0], ["1.2.3.4", 5432, 1]]
+# # Array of mirrors for the shard, each mirror entry is an array of `[host, port, index of server in servers array]`
+# # Traffic hitting the server identified by the index will be sent to the mirror.
+# # mirrors = [["1.2.3.4", 5432, 0], ["1.2.3.4", 5432, 1]]
 
-# Database name (e.g. "postgres")
-database = "shard0"
+# # Database name (e.g. "postgres")
+# database = "shard0"
 
-[pools.sharded_db.shards.1]
-servers = [["127.0.0.1", 5432, "primary"], ["localhost", 5432, "replica"]]
-database = "shard1"
+# [pools.sharded_db.shards.1]
+# servers = [["127.0.0.1", 5432, "primary"], ["localhost", 5432, "replica"]]
+# database = "shard1"
 
-[pools.sharded_db.shards.2]
-servers = [["127.0.0.1", 5432, "primary" ], ["localhost", 5432, "replica" ]]
-database = "shard2"
+# [pools.sharded_db.shards.2]
+# servers = [["127.0.0.1", 5432, "primary" ], ["localhost", 5432, "replica" ]]
+# database = "shard2"
 
 
 [pools.simple_db]
@@ -335,8 +335,8 @@ primary_reads_enabled = true
 sharding_function = "pg_bigint_hash"
 
 [pools.simple_db.users.0]
-username = "simple_user"
-password = "simple_user"
+username = "shubham_mishra"
+password = ""
 pool_size = 5
 min_pool_size = 3
 server_lifetime = 60000
@@ -344,7 +344,7 @@ statement_timeout = 0
 
 [pools.simple_db.shards.0]
 servers = [
-    [ "127.0.0.1", 5432, "primary" ],
-    [ "localhost", 5432, "replica" ]
+    [ "127.0.0.1", 5432, "primary" ]
+    # [ "localhost", 5432, "replica" ]
 ]
 database = "some_db"
